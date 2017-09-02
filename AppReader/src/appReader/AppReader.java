@@ -93,8 +93,8 @@ public class AppReader extends JFrame implements ActionListener{
 		top.add(blank3);
 		
 		top.add(title);
-		top.add(author);
 		top.add(type);
+		top.add(author);
 		top.add(search);
 		
 		
@@ -144,12 +144,15 @@ public class AppReader extends JFrame implements ActionListener{
 		    out.flush();
 		    out.println(userID);
 		    out.flush();
-		    oBook=Integer.parseInt(in.readLine());
+		    /*oBook=Integer.parseInt(in.readLine());
 		    System.out.println(oBook);
 		    norderedBook.setText(oBook.toString());
 		    bBook=Integer.parseInt(in.readLine());
 		    System.out.println(bBook);
-		    nborrowedBook.setText(bBook.toString());
+		    nborrowedBook.setText(bBook.toString()); */
+		    norderedBook.setText(in.readLine());
+		    nborrowedBook.setText(in.readLine());
+		    System.out.println(norderedBook.getText());
 		    
 		}catch(Exception z) {}
 	}
@@ -181,6 +184,7 @@ public class AppReader extends JFrame implements ActionListener{
 			out.flush();
 			out.println(author.getText());
 			out.flush();
+			System.out.println("tipo"+type.getText());
 			
 			try {
 				temp=in.readLine();
