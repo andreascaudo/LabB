@@ -4,6 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.*;
 
@@ -19,27 +24,39 @@ import javax.swing.ScrollPaneConstants;
 
 public class AppReader extends JFrame implements ActionListener{
 	JButton options,search,order;
-	JLabel status,ncode,borrowedBook,orderedBook,nborrowedBook,norderedBook,lblauthor,lbltipe,lbltitle;
+	JLabel status,ncode,borrowedBook,orderedBook,nborrowedBook,norderedBook,lblauthor,lbltype,lbltitle;
 	JTextArea area;
 	JScrollPane scroll;
 	JLabel blank1,blank2,blank3,blank4;
-	JTextField author,tipe,title,code;
+	JTextField author,type,title,code;
 	JPanel top,bot;
 	String Sstatus="Non Attivo";
 	String Sactive="Attivo";
-	boolean bstatus=false;
+	boolean bstatus;
 	private Integer bBook=0,oBook=0;
 	Socket socket;
 	private boolean running=true;
-	
-	public AppReader(Socket socket){
+	private static String userID;
+	InputStream inp = null;
+    BufferedReader in = null;
+    PrintWriter out = null;
+    String user;
+	public AppReader(Socket socket,String user){
+		try{
+			this.socket=socket;
+			this.user=user;
+			inp = socket.getInputStream();
+		    in = new BufferedReader(new InputStreamReader(inp));
+		    out = new PrintWriter(socket.getOutputStream());
+		}catch(Exception z){}	
+		
 		setSize(700, 400);
 		setLocation(450, 160);
 		setTitle("AppReader");
 		setResizable(false);
 		setLayout(new BorderLayout());
-		this.socket=socket;
 		
+		userID=user;
 		top=new JPanel();
 		top.setLayout(new GridLayout(3,4,0,0));
 		add(top,BorderLayout.NORTH);
@@ -58,9 +75,9 @@ public class AppReader extends JFrame implements ActionListener{
 		
 		lbltitle=new JLabel("Titolo");
 		lblauthor=new JLabel("Tipologia");
-		lbltipe=new JLabel("Autore");
+		lbltype=new JLabel("Autore");
 		
-		tipe=new JTextField();
+		type=new JTextField();
 		author=new JTextField();
 		title=new JTextField();
 		
@@ -72,12 +89,12 @@ public class AppReader extends JFrame implements ActionListener{
 		
 		top.add(lbltitle);
 		top.add(lblauthor);
-		top.add(lbltipe);
+		top.add(lbltype);
 		top.add(blank3);
 		
 		top.add(title);
 		top.add(author);
-		top.add(tipe);
+		top.add(type);
 		top.add(search);
 		
 		
@@ -85,7 +102,7 @@ public class AppReader extends JFrame implements ActionListener{
 		area.setEditable(false);
 		scroll=new JScrollPane(area);
 		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		add(area,BorderLayout.CENTER);
+		add(scroll,BorderLayout.CENTER);
 		
 		bot=new JPanel();
 		bot.setLayout(new GridLayout(2,4,0,0));
@@ -112,9 +129,39 @@ public class AppReader extends JFrame implements ActionListener{
 		bot.add(orderedBook);
 		bot.add(norderedBook);
 		setVisible(true);
+		updateSbook();
 		if(bstatus==false) {
 			JOptionPane.showMessageDialog(this, "Profilo non Attivo.","Inane warning",JOptionPane.WARNING_MESSAGE);
 		
+		}
+		updateSbook();
+		
+		
+	}
+	private void updateSbook(){
+		try {
+		    out.println("SBOOK");
+		    out.flush();
+		    out.println(userID);
+		    out.flush();
+		    oBook=Integer.parseInt(in.readLine());
+		    System.out.println(oBook);
+		    norderedBook.setText(oBook.toString());
+		    bBook=Integer.parseInt(in.readLine());
+		    System.out.println(bBook);
+		    nborrowedBook.setText(bBook.toString());
+		    
+		}catch(Exception z) {}
+	}
+	private void autOk() throws IOException{
+		String tmp;
+		out.println("AUTENTICATE");
+		out.flush();
+		tmp=in.readLine();
+		if(tmp.equals("TRUE")){
+			
+		}else if(tmp.equals("FALSE")){
+			
 		}
 	}
 	
@@ -123,15 +170,47 @@ public class AppReader extends JFrame implements ActionListener{
 			new ReaderOptions();
 		}
 		if(e.getSource()==search){
+			area.setText("");
+			String temp;
+			int items=0;
+			out.println("BKLIST");
+			out.flush();
+			out.println(title.getText());
+			out.flush();
+			out.println(type.getText());
+			out.flush();
+			out.println(author.getText());
+			out.flush();
 			
+			try {
+				temp=in.readLine();
+				//System.out.println("Client->"+temp);
+				while(!temp.equals("END")){
+					//System.out.println("Client->"+temp);
+					if(items%2==0 && items!=0)area.append("\n\n");
+						area.append(" "+temp+"\n");
+						items++;
+						temp=in.readLine();
+					
+				}
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 		if(e.getSource()==order){
 			//test --> delete this shit
-			oBook++;
-			bBook++;
-			nborrowedBook.setText(bBook.toString());
-			norderedBook.setText(oBook.toString());
-			 System.out.println();
+			//oBook++;
+			//bBook++;
+			//nborrowedBook.setText(bBook.toString());
+			//norderedBook.setText(oBook.toString());
+			//System.out.println();
+			if(bBook==5 || oBook==10){
+				if(bBook==5) JOptionPane.showMessageDialog(this, "Numero massimo prenotazioni raggiunto.","Inane warning",JOptionPane.WARNING_MESSAGE);
+				if(oBook==5) JOptionPane.showMessageDialog(this, "Numero massimo prestiti attivi raggiunto.","Inane warning",JOptionPane.WARNING_MESSAGE);	
+			}else{
+				//do order
+			}
 		}
 		
 	}

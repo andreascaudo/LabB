@@ -17,8 +17,8 @@ import java.util.Random;
 public class ServerThread extends Thread {
     protected Socket socket;
     private final String url = "jdbc:postgresql://localhost/LabB";
-    private final String user = "postgres";
-    private final String password = "an1996";
+    private final String user = "admin";
+    private final String password = "admin";
     
 
     String line;
@@ -54,6 +54,15 @@ public class ServerThread extends Thread {
                     if(line.equals("SIGNINU") || line.equals("SIGNINL")){
                     	signin(line);
                     }
+                    if(line.equals("SBOOK")){
+                    	nOrder();
+                    }
+                    if(line.equals("BKLIST")){
+                    	booksList();
+                    }
+                    if(line.equals("AUTENTICATE")){
+                    	autenticate();
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -61,7 +70,83 @@ public class ServerThread extends Thread {
             }
         }
     }
-    
+    private void autenticate(){
+    	
+    }
+    private void nOrder() throws IOException{
+		String tmp=brinp.readLine();
+		
+		String query="SELECT count(*)"
+				+ "FROM public.\"User\" u join public.\"Prenotazione\" p on u.\"CodFiscale\" = p.\"IDUser\""
+				+ "WHERE u.\"CodFiscale\"='"+tmp+"' ";
+		
+		String query2 ="SELECT count(*)"
+				+ "FROM public.\"User\" u join public.\"Prestito\" p on u.\"CodFiscale\" = p.\"IDUser\""
+						+ "WHERE u.\"CodFiscale\"='"+tmp+ "' and p.\"DataConsegna\" is null";
+		
+		try (Connection conn = connect();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(query)){
+                rs.next();
+                sout.println(rs.getString(1));
+                sout.flush();   
+                
+                ResultSet rs1 = stmt.executeQuery(query2);
+                rs1.next();
+                sout.println(rs1.getString(1));
+                sout.flush();   
+                System.out.println(rs.getString(1));
+                System.out.println(rs1);
+                
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+		//System.out.println("error");
+	}
+    private void booksList() throws IOException{
+		String title,type,author;
+		String temp="";
+		title=brinp.readLine();
+		type=brinp.readLine();
+		author=brinp.readLine();
+		System.out.println(title+type+author);
+		String query="SELECT *"
+				+ "FROM public.\"Libro\" l join public.\"Tipologia\" ti on l.\"Tipologia\" = ti.\"ID\""
+				+ "WHERE l.\"ISBN\" is not null "; 
+				//(l.\"Titolo\" like '"+title+"%' or l.\"Titolo\" like '_"+title+"_')" and ti.\"Tipologia\" like '"+type+"%' and (l.\"Autore\"[1] ='"+author+"' or l.\"Autore\"[2] ='"+author+"')";
+		if(!title.equals("") && title!=null){
+			query=query + "and (l.\"Titolo\" like '"+title+"%' or l.\"Titolo\" like '_"+title+"_')";
+		}
+		if(!type.equals("") && type!=null){
+			query=query + "and ti.\"Tipologia\" like '"+type+"%'";
+		}
+		if(!author.equals("") && author!=null){
+			query=query + "and (l.\"Autore\"[1] ='"+author+"' or l.\"Autore\"[2] ='"+author+"')";
+		}
+		System.out.println(query);
+		try (Connection conn = connect();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(query)){
+				//System.out.println(rs.getString(1));
+                while(rs.next()){
+                	for(int i=1;i<=9;i++){
+	                	temp=temp+rs.getString(i)+" ";
+                		//System.out.print(rs.getString(2));
+	                	
+	                }
+                	//System.out.println(temp);
+                	
+                	sout.println(temp);
+                	sout.flush();
+                	temp="";
+                }
+                sout.println("END");
+                sout.flush();
+                
+		} catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+	}
     private void login(String line) {
     	String name,psw;
 		sout.println("OK");
