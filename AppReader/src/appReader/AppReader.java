@@ -40,15 +40,17 @@ public class AppReader extends JFrame implements ActionListener{
 	InputStream inp = null;
     BufferedReader in = null;
     PrintWriter out = null;
-    String user;
+ 
 	public AppReader(Socket socket,String user){
 		try{
 			this.socket=socket;
-			this.user=user;
+			
 			inp = socket.getInputStream();
 		    in = new BufferedReader(new InputStreamReader(inp));
 		    out = new PrintWriter(socket.getOutputStream());
 		}catch(Exception z){}	
+		
+		userID=user;
 		
 		setSize(700, 400);
 		setLocation(450, 160);
@@ -56,7 +58,7 @@ public class AppReader extends JFrame implements ActionListener{
 		setResizable(false);
 		setLayout(new BorderLayout());
 		
-		userID=user;
+		
 		top=new JPanel();
 		top.setLayout(new GridLayout(3,4,0,0));
 		add(top,BorderLayout.NORTH);
@@ -144,16 +146,16 @@ public class AppReader extends JFrame implements ActionListener{
 		    out.flush();
 		    out.println(userID);
 		    out.flush();
-		    /*oBook=Integer.parseInt(in.readLine());
-		    System.out.println(oBook);
+		    oBook=Integer.parseInt(in.readLine());
+		   // System.out.println(oBook);
 		    norderedBook.setText(oBook.toString());
 		    bBook=Integer.parseInt(in.readLine());
-		    System.out.println(bBook);
-		    nborrowedBook.setText(bBook.toString()); */
-		    norderedBook.setText(in.readLine());
+		    //System.out.println(bBook);
+		    nborrowedBook.setText(bBook.toString()); 
+		    /*norderedBook.setText(in.readLine());
 		    nborrowedBook.setText(in.readLine());
 		    System.out.println(norderedBook.getText());
-		    
+		    System.out.println(nborrowedBook.getText());*/
 		}catch(Exception z) {}
 	}
 	private void autOk() throws IOException{
@@ -211,7 +213,7 @@ public class AppReader extends JFrame implements ActionListener{
 			//System.out.println();
 			if(bBook==5 || oBook==10){
 				if(bBook==5) JOptionPane.showMessageDialog(this, "Numero massimo prenotazioni raggiunto.","Inane warning",JOptionPane.WARNING_MESSAGE);
-				if(oBook==5) JOptionPane.showMessageDialog(this, "Numero massimo prestiti attivi raggiunto.","Inane warning",JOptionPane.WARNING_MESSAGE);	
+				if(oBook==10) JOptionPane.showMessageDialog(this, "Numero massimo prestiti attivi raggiunto.","Inane warning",JOptionPane.WARNING_MESSAGE);	
 			}else{
 				//do order
 			}

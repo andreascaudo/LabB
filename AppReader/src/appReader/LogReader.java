@@ -380,7 +380,7 @@ public class LogReader extends JFrame implements ActionListener{
 					out.flush();
 					temp = in.readLine();
 					if(temp.equals("1")){
-						new AppReader(socket,txtName.getText());
+						new AppReader(socket,txtUsernameLog.getText());
 						this.dispose();
 					}else if(temp.equals("0")){
 						System.out.println("Dati inseriti non corretti!");

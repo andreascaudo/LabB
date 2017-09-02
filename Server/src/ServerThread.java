@@ -83,7 +83,7 @@ public class ServerThread extends Thread {
 		String query2 ="SELECT count(*)"
 				+ "FROM public.\"User\" u join public.\"Prestito\" p on u.\"CodFiscale\" = p.\"IDUser\""
 						+ "WHERE u.\"CodFiscale\"='"+tmp+ "' and p.\"DataConsegna\" is null";
-		
+		System.out.println(query);
 		try (Connection conn = connect();
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(query)){
