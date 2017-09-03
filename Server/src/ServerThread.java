@@ -7,11 +7,14 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Random;
 
 public class ServerThread extends Thread {
@@ -216,9 +219,51 @@ public class ServerThread extends Thread {
     private void bookOrder() throws IOException{
     	String book,user;
     	book=brinp.readLine();
-    	user=brinp.readLine();
     	
-    }
+    	user=brinp.readLine();
+    	System.out.println("prova"+user+book);
+    	Calendar c=Calendar.getInstance();
+    	//System.out.println(c.get(Calendar.YEAR));
+    	//System.out.println(c.get(Calendar.MONTH)+1);
+    	//System.out.println(c.get(Calendar.DAY_OF_MONTH));
+    	Date date=new Date(c.get(Calendar.YEAR)-1900,c.get(Calendar.MONTH),c.get(Calendar.DAY_OF_MONTH));
+    	Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        //System.out.println(timestamp);
+    	String query="Insert into public.\"Prenotazione\"(\"IDUser\",\"IDLibro\",\"Data\",\"Ora\")"
+    			+ "values (?,?,?,?)";
+    	 try (Connection conn = connect();
+                 PreparedStatement pstmt = conn.prepareStatement(query,
+                 Statement.RETURN_GENERATED_KEYS)) {
+  
+             pstmt.setString(1, user);
+             pstmt.setString(2, book);
+             pstmt.setDate(3, date);
+             pstmt.setTimestamp(4,timestamp);
+             //pstmt.setTimestamp(4,java.sql.Timestamp.valueOf("2016-01-25 00:00:10"));
+            
+            
+             
+             int affectedRows = pstmt.executeUpdate();
+             if(affectedRows > 0){
+             	//sout.println("OK");
+             	//sout.flush();
+             	System.out.println("PRENOTATO");
+             }
+             
+         } catch (SQLException ex) {
+             System.out.println(ex.getMessage());
+             //sout.println("NOTOK");
+        	 //sout.flush();
+             
+         }
+    	 //sout.println("");
+    	 //sout.flush();
+
+ 	}
+
+    	
+
+    
     private void nOrder() throws IOException{
 		String tmp=brinp.readLine();
 		

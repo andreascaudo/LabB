@@ -294,16 +294,31 @@ public class AppReader extends JFrame implements ActionListener{
 				if(bBook==5 || oBook==10){
 					if(bBook==5) JOptionPane.showMessageDialog(this, "Numero massimo prenotazioni raggiunto.","Inane warning",JOptionPane.WARNING_MESSAGE);
 					if(oBook==10) JOptionPane.showMessageDialog(this, "Numero massimo prestiti attivi raggiunto.","Inane warning",JOptionPane.WARNING_MESSAGE);	
+				}else if(code.getText().equals("")){
+					JOptionPane.showMessageDialog(this, "Nessun codice inserito","Inane warning",JOptionPane.WARNING_MESSAGE);
 				}else{
 					out.println("ORDER");
 					out.flush();
 					
 					out.println(code.getText());
-					out.println();
+					out.flush();
 					
 					out.println(userID);
 					out.println();
+					//System.out.println(userID);
 					
+					/*try {
+						String s;
+						s=in.readLine();
+						if(s.equals("OK")){
+							JOptionPane.showMessageDialog(this,"Libro Prenotato","A plain message", JOptionPane.PLAIN_MESSAGE);
+						}else{
+							JOptionPane.showMessageDialog(this, "Errore durante la prenotazione","Inane warning",JOptionPane.WARNING_MESSAGE);
+						}
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}*/
 					
 					updateSbook();
 				}
