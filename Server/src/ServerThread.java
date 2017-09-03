@@ -63,6 +63,24 @@ public class ServerThread extends Thread {
                     if(line.equals("AUTENTICATE")){
                     	autenticate();
                     }
+                    if(line.equals("AUTENTICATECODE")){
+                    	autenticateCode();
+                    }
+                    if(line.equals("SETSTATUS")){
+                    	setStatus();
+                    }
+                    if(line.equals("DELETEUSER")){
+                    	deleteUser();
+                    }
+                    if(line.equals("ORDER")){
+                    	bookOrder();
+                    }
+                    if(line.equals("GETPSW")){
+                    	getPsw();
+                    }
+                    if(line.equals("SETPSW")){
+                    	setPsw();
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -70,7 +88,117 @@ public class ServerThread extends Thread {
             }
         }
     }
-    private void autenticate(){
+    private void getPsw() throws IOException{
+    	String tmp;
+    	
+    	tmp=brinp.readLine();
+    	String query="SELECT \"User\".\"Password\""
+    			+ "FROM public.\"User\""
+    			+ "WHERE \"User\".\"CodFiscale\"='"+tmp+"'";
+    	
+    	try (Connection conn = connect();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(query)){
+                rs.next();
+                
+                
+                sout.println(rs.getString(1));
+                sout.flush();
+    	}catch(Exception w){
+    		
+    	}
+    	
+    }
+    private void setPsw(){
+    	
+    }
+    private void deleteUser() throws IOException{
+    	String tmp;
+    	
+    	tmp=brinp.readLine();
+    	String query="DELETE FROM public.\"User\""
+    			+ "WHERE \"User\".\"CodFiscale\"='"+tmp+"'";
+    	System.out.println(query);
+    	try (Connection conn = connect();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(query)){
+                rs.next();
+       
+                
+    	} catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+    private void setStatus()throws IOException{
+    	String tmp;
+    	
+    	tmp=brinp.readLine();
+    	String query="UPDATE public.\"User\""
+    			+ " SET \"Autenticato\"=true"
+    			+ " WHERE \"User\".\"CodFiscale\"='"+tmp+"'";
+    	System.out.println(query);
+    	try (Connection conn = connect();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(query)){
+                rs.next();
+       
+                
+    	} catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+    private void autenticate() throws IOException{
+    	String tmp;
+    	boolean aut;
+    	tmp=brinp.readLine();
+    	String query="SELECT \"User\".\"Autenticato\""
+    			+ "FROM public.\"User\""
+    			+ "WHERE \"User\".\"CodFiscale\"='"+tmp+"'";
+    	
+    	try (Connection conn = connect();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(query)){
+                rs.next();
+                aut=rs.getBoolean(1);
+                //sout.println(rs.getString(1));
+                //sout.flush();
+                if(aut==true){
+                	sout.println("TRUE");
+                	sout.flush();
+                }else{
+                	sout.println("FALSE");
+                	sout.flush();
+                }
+    	} catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+    	
+    }
+    private void autenticateCode() throws IOException{
+    	String tmp;
+    	
+    	tmp=brinp.readLine();
+    	String query="SELECT \"User\".\"CodAut\""
+    			+ "FROM public.\"User\""
+    			+ "WHERE \"User\".\"CodFiscale\"='"+tmp+"'";
+    	
+    	try (Connection conn = connect();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(query)){
+                rs.next();
+                
+                //sout.println(rs.getString(1));
+                //sout.flush();
+                
+                sout.println(rs.getString(1));
+                sout.flush();
+                
+    	} catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+    	
+    }
+    private void bookOrder(){
     	
     }
     private void nOrder() throws IOException{
@@ -83,7 +211,7 @@ public class ServerThread extends Thread {
 		String query2 ="SELECT count(*)"
 				+ "FROM public.\"User\" u join public.\"Prestito\" p on u.\"CodFiscale\" = p.\"IDUser\""
 						+ "WHERE u.\"CodFiscale\"='"+tmp+ "' and p.\"DataConsegna\" is null";
-		System.out.println(query);
+		//System.out.println(query);
 		try (Connection conn = connect();
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(query)){

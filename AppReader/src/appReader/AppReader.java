@@ -34,14 +34,18 @@ public class AppReader extends JFrame implements ActionListener{
 	String Sactive="Attivo";
 	boolean bstatus;
 	private Integer bBook=0,oBook=0;
+	private int error=0;
 	Socket socket;
 	private boolean running=true;
 	private static String userID;
 	InputStream inp = null;
     BufferedReader in = null;
     PrintWriter out = null;
- 
-	public AppReader(Socket socket,String user){
+    JButton aut;
+    JTextField autCode;
+    JFrame f;
+    JLabel l;
+	public AppReader(Socket socket,String user) throws IOException{
 		try{
 			this.socket=socket;
 			
@@ -51,6 +55,12 @@ public class AppReader extends JFrame implements ActionListener{
 		}catch(Exception z){}	
 		
 		userID=user;
+		
+		f=new JFrame();
+		l=new JLabel("Inserisci codice verifica");
+		aut=new JButton("Verifica");
+		autCode=new JTextField();
+		aut.addActionListener(this);
 		
 		setSize(700, 400);
 		setLocation(450, 160);
@@ -72,7 +82,7 @@ public class AppReader extends JFrame implements ActionListener{
 		blank1=new JLabel();
 		blank2=new JLabel();
 		blank3=new JLabel();
-		status=new JLabel(Sstatus);
+		status=new JLabel();
 	
 		
 		lbltitle=new JLabel("Titolo");
@@ -132,11 +142,12 @@ public class AppReader extends JFrame implements ActionListener{
 		bot.add(norderedBook);
 		setVisible(true);
 		updateSbook();
-		if(bstatus==false) {
+		autOk();
+		/*if(bstatus==false) {
 			JOptionPane.showMessageDialog(this, "Profilo non Attivo.","Inane warning",JOptionPane.WARNING_MESSAGE);
 		
-		}
-		updateSbook();
+		}*/
+		//updateSbook();
 		
 		
 	}
@@ -162,63 +173,135 @@ public class AppReader extends JFrame implements ActionListener{
 		String tmp;
 		out.println("AUTENTICATE");
 		out.flush();
+		out.println(userID);
+		out.flush();
+		System.out.println("autenticate");
 		tmp=in.readLine();
 		if(tmp.equals("TRUE")){
-			
+			bstatus=true;
+			status.setText(Sactive);
 		}else if(tmp.equals("FALSE")){
+			bstatus=false;
+			status.setText(Sstatus);
+			JOptionPane.showMessageDialog(this, "Profilo non Attivo.","Inane warning",JOptionPane.WARNING_MESSAGE);
+			//JFrame f=new JFrame();
+			//JLabel l=new JLabel("Inserisci codice verifica");
+			//JButton aut=new JButton("Verifica");
+			//aut.addActionListener(this);
+			f.setSize(250, 150);
+			f.setLocation(550, 160);
+			f.setTitle("Autenticate");
+			f.setResizable(false);
+			f.setLayout(new GridLayout(3,1));
+			f.add(l);
+			f.add(autCode);
+			f.add(aut);
+			f.setVisible(true);
 			
+			//f.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		}
 	}
 	
-	public void actionPerformed(ActionEvent e) {
-		if(e.getSource()==options){
-			new ReaderOptions();
-		}
-		if(e.getSource()==search){
-			area.setText("");
+	public void actionPerformed(ActionEvent e){
+		if(e.getSource()==aut){
 			String temp;
-			int items=0;
-			out.println("BKLIST");
+			System.out.println(autCode.getText());
+			out.println("AUTENTICATECODE");
 			out.flush();
-			out.println(title.getText());
+			out.println(userID);
 			out.flush();
-			out.println(type.getText());
-			out.flush();
-			out.println(author.getText());
-			out.flush();
-			System.out.println("tipo"+type.getText());
-			
 			try {
 				temp=in.readLine();
-				//System.out.println("Client->"+temp);
-				while(!temp.equals("END")){
-					//System.out.println("Client->"+temp);
-					if(items%2==0 && items!=0)area.append("\n\n");
-						area.append(" "+temp+"\n");
-						items++;
-						temp=in.readLine();
+				if(temp.equals(autCode.getText())){
+					out.println("SETSTATUS");
+					out.flush();
+					out.println(userID);
+					out.flush();
+					autOk();
+					f.dispose();
+				}else{
+					error++;
+					autCode.setText("");
+					JOptionPane.showMessageDialog(this, error+"° tentativo fallito","Inane warning",JOptionPane.WARNING_MESSAGE);
+					if(error==5){
+						JOptionPane.showMessageDialog(this,"Numero massimo di errori raggiunto,"
+								+ "il Profivo verrà eliminato","Inane warning",JOptionPane.WARNING_MESSAGE);
+						out.println("DELETEUSER");
+						out.flush();
+						out.println(userID);
+						out.flush();
+						out.println("QUIT");
+						out.flush();
+						dispose();
+						f.dispose();
+					
+					}
+					
 					
 				}
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-		}
-		if(e.getSource()==order){
-			//test --> delete this shit
-			//oBook++;
-			//bBook++;
-			//nborrowedBook.setText(bBook.toString());
-			//norderedBook.setText(oBook.toString());
-			//System.out.println();
-			if(bBook==5 || oBook==10){
-				if(bBook==5) JOptionPane.showMessageDialog(this, "Numero massimo prenotazioni raggiunto.","Inane warning",JOptionPane.WARNING_MESSAGE);
-				if(oBook==10) JOptionPane.showMessageDialog(this, "Numero massimo prestiti attivi raggiunto.","Inane warning",JOptionPane.WARNING_MESSAGE);	
-			}else{
-				//do order
-			}
+			
 		}
 		
+		if(e.getSource()==options){
+			new ReaderOptions(socket,userID);
+		}
+		if(e.getSource()==search){
+			if(bstatus){	
+				area.setText("");
+				String temp;
+				int items=0;
+				out.println("BKLIST");
+				out.flush();
+				out.println(title.getText());
+				out.flush();
+				out.println(type.getText());
+				out.flush();
+				out.println(author.getText());
+				out.flush();
+				System.out.println("tipo"+type.getText());
+				
+				try {
+					temp=in.readLine();
+					//System.out.println("Client->"+temp);
+					while(!temp.equals("END")){
+						//System.out.println("Client->"+temp);
+						if(items%2==0 && items!=0)area.append("\n\n");
+							area.append(" "+temp+"\n");
+							items++;
+							temp=in.readLine();
+						
+					}
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}else{
+				JOptionPane.showMessageDialog(this, "Profilo non Attivo.","Inane warning",JOptionPane.WARNING_MESSAGE);
+			}
+		}
+		if(e.getSource()==order){
+			if(bstatus){	
+				//test --> delete this shit
+				//oBook++;
+				//bBook++;
+				//nborrowedBook.setText(bBook.toString());
+				//norderedBook.setText(oBook.toString());
+				//System.out.println();
+				if(bBook==5 || oBook==10){
+					if(bBook==5) JOptionPane.showMessageDialog(this, "Numero massimo prenotazioni raggiunto.","Inane warning",JOptionPane.WARNING_MESSAGE);
+					if(oBook==10) JOptionPane.showMessageDialog(this, "Numero massimo prestiti attivi raggiunto.","Inane warning",JOptionPane.WARNING_MESSAGE);	
+				}else{
+					out.println("ORDER");
+				}
+		}else{
+			JOptionPane.showMessageDialog(this, "Profilo non Attivo.","Inane warning",JOptionPane.WARNING_MESSAGE);
+		}
+			
+		
 	}
-
+  }
 }
