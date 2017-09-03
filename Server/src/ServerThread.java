@@ -213,7 +213,10 @@ public class ServerThread extends Thread {
         }
     	
     }
-    private void bookOrder(){
+    private void bookOrder() throws IOException{
+    	String book,user;
+    	book=brinp.readLine();
+    	user=brinp.readLine();
     	
     }
     private void nOrder() throws IOException{
