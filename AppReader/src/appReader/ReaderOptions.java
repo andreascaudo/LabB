@@ -107,12 +107,22 @@ public class ReaderOptions extends JFrame implements ActionListener{
 			try {
 				tmp=in.readLine();
 				if(tmp.equals(tmoPsw.getText())){
-					out.println("SETPSW");
-					out.flush();
-					out.println(userID);
-					out.flush();
+					
+					if(tmnPsw.getText().equals(tmnPsw2.getText())){
+						out.println("SETPSW");
+						out.flush();
+						out.println(userID);
+						out.flush();
+						out.println(tmnPsw.getText());
+						out.flush();
+						tmoPsw.setText("");
+						tmnPsw.setText("");
+						tmnPsw2.setText("");
+					}else{
+						JOptionPane.showMessageDialog(this,"Le nuove Password non Combaciano","Inane warning",JOptionPane.WARNING_MESSAGE);
+					}
 				}else{
-					JOptionPane.showMessageDialog(this,"Password Non Corretta","Inane warning",JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(this,"Old Password Non Corretta","Inane warning",JOptionPane.WARNING_MESSAGE);
 					tmoPsw.setText("");
 					tmnPsw.setText("");
 					tmnPsw2.setText("");

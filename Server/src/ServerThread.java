@@ -109,8 +109,23 @@ public class ServerThread extends Thread {
     	}
     	
     }
-    private void setPsw(){
-    	
+    private void setPsw() throws IOException{
+    	String user,psw;
+    	user=brinp.readLine();
+    	psw=brinp.readLine();
+    	String query="UPDATE public.\"User\""
+    			+ " SET \"Password\"='"+psw+"'"
+    			+ " WHERE \"User\".\"CodFiscale\"='"+user+"'";
+    	System.out.println(query);
+    	try (Connection conn = connect();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(query)){
+                rs.next();
+       
+                
+    	} catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
     private void deleteUser() throws IOException{
     	String tmp;

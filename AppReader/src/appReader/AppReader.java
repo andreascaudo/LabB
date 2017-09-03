@@ -296,6 +296,10 @@ public class AppReader extends JFrame implements ActionListener{
 					if(oBook==10) JOptionPane.showMessageDialog(this, "Numero massimo prestiti attivi raggiunto.","Inane warning",JOptionPane.WARNING_MESSAGE);	
 				}else{
 					out.println("ORDER");
+					out.flush();
+					
+					out.println(code.getText());
+					out.println();
 				}
 		}else{
 			JOptionPane.showMessageDialog(this, "Profilo non Attivo.","Inane warning",JOptionPane.WARNING_MESSAGE);
