@@ -300,6 +300,12 @@ public class AppReader extends JFrame implements ActionListener{
 					
 					out.println(code.getText());
 					out.println();
+					
+					out.println(userID);
+					out.println();
+					
+					
+					updateSbook();
 				}
 		}else{
 			JOptionPane.showMessageDialog(this, "Profilo non Attivo.","Inane warning",JOptionPane.WARNING_MESSAGE);
