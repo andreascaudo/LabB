@@ -180,7 +180,7 @@ public class ServerThread extends Thread {
                 aut=rs.getBoolean(1);
                 //sout.println(rs.getString(1));
                 //sout.flush();
-                if(aut==true){
+                if(aut){
                 	sout.println("TRUE");
                 	sout.flush();
                 }else{
@@ -188,6 +188,8 @@ public class ServerThread extends Thread {
                 	sout.flush();
                 }
     	} catch (SQLException ex) {
+    		sout.println("FALSE");
+        	sout.flush();
             System.out.println(ex.getMessage());
         }
     	
@@ -216,11 +218,15 @@ public class ServerThread extends Thread {
         }
     	
     }
-    private void bookOrder() throws IOException{
-    	String book,user;
-    	book=brinp.readLine();
-    	
-    	user=brinp.readLine();
+    private void bookOrder(){
+    	String book = null,user = null;
+    	try {
+			book=brinp.readLine();
+	    	user=brinp.readLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	System.out.println("prova"+user+book);
     	Calendar c=Calendar.getInstance();
     	//System.out.println(c.get(Calendar.YEAR));
@@ -231,6 +237,7 @@ public class ServerThread extends Thread {
         //System.out.println(timestamp);
     	String query="Insert into public.\"Prenotazione\"(\"IDUser\",\"IDLibro\",\"Data\",\"Ora\")"
     			+ "values (?,?,?,?)";
+
     	 try (Connection conn = connect();
                  PreparedStatement pstmt = conn.prepareStatement(query,
                  Statement.RETURN_GENERATED_KEYS)) {
@@ -240,24 +247,24 @@ public class ServerThread extends Thread {
              pstmt.setDate(3, date);
              pstmt.setTimestamp(4,timestamp);
              //pstmt.setTimestamp(4,java.sql.Timestamp.valueOf("2016-01-25 00:00:10"));
-            
+
             
              
              int affectedRows = pstmt.executeUpdate();
              if(affectedRows > 0){
-             	//sout.println("OK");
-             	//sout.flush();
-             	System.out.println("PRENOTATO");
+             	sout.println("OK");
+             	sout.flush();
+             }else{
+                 sout.println("COD_ERROR");
+            	 sout.flush();
              }
              
          } catch (SQLException ex) {
+        	 sout.println("COD_ERROR");
+        	 sout.flush();
              System.out.println(ex.getMessage());
-             //sout.println("NOTOK");
-        	 //sout.flush();
              
          }
-    	 //sout.println("");
-    	 //sout.flush();
 
  	}
 
@@ -306,7 +313,7 @@ public class ServerThread extends Thread {
 				+ "WHERE l.\"ISBN\" is not null "; 
 				//(l.\"Titolo\" like '"+title+"%' or l.\"Titolo\" like '_"+title+"_')" and ti.\"Tipologia\" like '"+type+"%' and (l.\"Autore\"[1] ='"+author+"' or l.\"Autore\"[2] ='"+author+"')";
 		if(!title.equals("") && title!=null){
-			query=query + "and (l.\"Titolo\" like '"+title+"%' or l.\"Titolo\" like '_"+title+"_')";
+			query=query + "and (l.\"Titolo\" like '"+title+"%' or l.\"Titolo\" like '%"+title+"%')";
 		}
 		if(!type.equals("") && type!=null){
 			query=query + "and ti.\"Tipologia\" like '"+type+"%'";

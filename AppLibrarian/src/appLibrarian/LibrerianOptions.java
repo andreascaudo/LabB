@@ -3,15 +3,20 @@ package appLibrarian;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.Socket;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
 public class LibrerianOptions extends JFrame implements ActionListener{
-	JButton loanBook,historyLoanBook,totalLoanBook,totalReservedBook,rankingBook,totalExpiredLoan;
+	JButton loanBook,historyLoanBook,totalLoanBook,totalReservedBook,rankingBook,totalExpiredLoan,delateBook,registerUser,addBook;
+	Socket socket;
+	String userID;
 	
-	public LibrerianOptions() {
-		
+	public LibrerianOptions(Socket socket, String userID) {
+
+		this.userID=userID;
+		this.socket=socket;
 		
 		loanBook=new JButton("Elenco Prestiti Utente");
 		loanBook.addActionListener(this);
@@ -31,15 +36,27 @@ public class LibrerianOptions extends JFrame implements ActionListener{
 		totalExpiredLoan = new JButton("Elenco Prestiti Sconfinati");
 		totalExpiredLoan.addActionListener(this);
 		add(totalExpiredLoan);
+
+		delateBook=new JButton("Elimina libro");
+		delateBook.addActionListener(this);
+		add(delateBook);
+		registerUser = new JButton("Registra utente");
+		registerUser.addActionListener(this);
+		add(delateBook);
+
+		addBook=new JButton("Aggiungi libro");
+		addBook.addActionListener(this);
+		add(addBook);
 		
 		setSize(350, 250);
 		setLocation(450, 160);
 		setTitle("Options");
 		setResizable(false);
-		setLayout(new GridLayout(3,2,5,5));
+		setLayout(new GridLayout(4,2,5,5));
 	
 		
 		setVisible(true);
+
 	}
 	
 	

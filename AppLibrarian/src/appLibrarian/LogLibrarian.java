@@ -311,7 +311,7 @@ public class LogLibrarian extends JFrame implements ActionListener{
 					out.println(txtPswReg.getText());
 					out.flush();
 					if(in.readLine().equals("SIGNOK")){
-						new AppLibrarian(socket);
+						new AppLibrarian(socket,txtUsernameLog.getText());
 						this.dispose();
 					}else{
 						System.out.println("Dati inseriti non corretti!");
@@ -338,7 +338,7 @@ public class LogLibrarian extends JFrame implements ActionListener{
 					out.flush();
 					temp = in.readLine();
 					if(temp.equals("1")){
-						new AppLibrarian(socket);
+						new AppLibrarian(socket,txtUsernameLog.getText());
 						this.dispose();
 					}else if(temp.equals("0")){
 						System.out.println("Dati inseriti non corretti!");

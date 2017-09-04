@@ -2,6 +2,7 @@ package appReader;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -142,6 +143,7 @@ public class AppReader extends JFrame implements ActionListener{
 		bot.add(norderedBook);
 		setVisible(true);
 		updateSbook();
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		autOk();
 		/*if(bstatus==false) {
 			JOptionPane.showMessageDialog(this, "Profilo non Attivo.","Inane warning",JOptionPane.WARNING_MESSAGE);
@@ -266,7 +268,7 @@ public class AppReader extends JFrame implements ActionListener{
 				
 				try {
 					temp=in.readLine();
-					//System.out.println("Client->"+temp);
+					System.out.println("Client->"+temp);
 					while(!temp.equals("END")){
 						//System.out.println("Client->"+temp);
 						if(items%2==0 && items!=0)area.append("\n\n");
@@ -304,21 +306,20 @@ public class AppReader extends JFrame implements ActionListener{
 					out.flush();
 					
 					out.println(userID);
-					out.println();
+					out.flush();
 					//System.out.println(userID);
 					
-					/*try {
-						String s;
-						s=in.readLine();
-						if(s.equals("OK")){
-							JOptionPane.showMessageDialog(this,"Libro Prenotato","A plain message", JOptionPane.PLAIN_MESSAGE);
+					try {
+						if(in.readLine().equals("OK")){
+							JOptionPane.showMessageDialog(this, "Prenotazione effettuata","OK",JOptionPane.INFORMATION_MESSAGE);
 						}else{
-							JOptionPane.showMessageDialog(this, "Errore durante la prenotazione","Inane warning",JOptionPane.WARNING_MESSAGE);
+							JOptionPane.showMessageDialog(this, "Codice libro errato!","Inane warning",JOptionPane.WARNING_MESSAGE);
 						}
-					} catch (IOException e1) {
+					} catch (HeadlessException | IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					}*/
+					}
+					code.setText("");
 					
 					updateSbook();
 				}
